@@ -24,7 +24,7 @@ class UserManager(UserManager):
 
     def check_email_unique(self, email):
         if UserModel.objects.filter(email=email).exists():
-            raise ValidationError(_("Email exists"))
+            raise ValidationError(_("Email already used."))
         return email
 
 

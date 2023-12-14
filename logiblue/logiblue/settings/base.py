@@ -61,7 +61,7 @@ ROOT_URLCONF = 'logiblue.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR.parent / 'core' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -148,3 +148,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "apps.authbase.api.authorization.serializers.TokenObtainPairSerializer",  # noqa
 }
+
+MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/auth/login"  # new
