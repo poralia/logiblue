@@ -36,6 +36,5 @@ class UserCreationFormExtend(UserCreationForm):
         if username is None and email is not None:
             username = User.objects.generate_username_from_email(email)
             user.username = username
-            user.save()
-    
+
         return user
