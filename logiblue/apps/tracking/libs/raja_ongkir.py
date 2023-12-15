@@ -1,12 +1,15 @@
 import requests
 import os
 
-from whoosh import fields, query as wq
+from whoosh import fields
 from whoosh.fields import Schema
 from whoosh.index import create_in
 from whoosh.qparser import QueryParser
 
 from django.conf import settings
+from django.db.models import F
+
+from apps.tracking.models import Category
 
 
 class RajaOngkir:
@@ -20,6 +23,7 @@ class RajaOngkir:
         city_name=fields.TEXT(stored=True),
         postal_code=fields.TEXT(stored=True),
     )
+    default_origin = "152"  # from Jakarta Pusat
 
     def __init__(self) -> None:
         pass
@@ -74,3 +78,61 @@ class RajaOngkir:
 
             return results
         return documents
+
+    def get_tiki(self, x):
+        if x.get('code') == 'tiki':
+            return x
+        return None
+
+    def get_tiki_eco(self, x):
+        if x.get('service') == 'ECO':
+            return x
+        return None
+
+    def calculate(self, country_code, category_id, weight, destination_id):
+        category = Category.objects \
+            .prefetch_related('country') \
+            .select_related('country') \
+            .filter(country__iso_code=country_code, id=category_id) \
+            .annotate(cost=F('price_per_kilo') * weight) \
+            .first()
+
+        if not category:
+            return None
+
+        url = self.base_url_api + '/cost'
+        payload = {
+            'origin': self.default_origin,
+            'destination': destination_id,
+            'weight': weight,
+            'courier': ["tiki"],
+        }
+
+        r = self.session.post(url, data=payload)
+        rajaongkir = r.json().get('rajaongkir', {})
+        results = rajaongkir.get('results', [])
+        origin_details = rajaongkir.get('origin_details', {})
+        destination_details = rajaongkir.get('destination_details', {})
+
+        # use ECO service from TIKI
+        # for demo purpose only
+        tiki = next(filter(self.get_tiki, results), None)
+        tiki_eco = next(filter(self.get_tiki_eco, tiki.get('costs', [])), None)
+        tiki_eco_cost = tiki_eco.get('cost')[0].get('value')
+
+        ret = {
+            'status_code': r.status_code,
+            'data': {
+                'origin': category.country.name,
+                'origin_details': origin_details,
+                'destination_details': destination_details,
+                'destination': destination_id,
+                'category_name': category.title,
+                'international_shipping_price': category.cost,
+                'domestic_price': tiki_eco_cost,
+                'total_price': tiki_eco_cost + category.cost,
+                # 'domestic_shippings': results,
+            },
+        }
+
+        return ret
