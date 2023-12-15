@@ -32,7 +32,7 @@ Best practice always use Python environment. In this case I use Windows 10.
 This application has several Rest APIs endpoint
 
 - Search country GET: `/api/countries?search={keyword}`
-- Search category GET: `/api/categories/?country_code={ISO 3166 (3 digits)}/&search={keyword}`
+- Search category GET: `/api/categories/?country_code={ISO 3166 (3 digits)}&search={keyword}`
 - Search destination city GET: `/api/cities/?search={keyword city name}`
 - Calculate freight POST: `/api/calculate/` with body:
 
