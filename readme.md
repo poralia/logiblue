@@ -10,7 +10,7 @@ This application build with Django 5.x.x version and use Python version 3.10.x. 
 - Login and register with Rest API. Use bearer token authentication
 - Simplest CRUD Country and Category for international pricing
 - Use Raja Ongkir API for calculate domestic shipping price
-- Dump/Import Country and Category data from .csv files
+- Dump/Import Country and Category data from .csv files (example files inside root dir)
 - Searching: country, category and city
 
 ### How to run
@@ -22,6 +22,7 @@ Best practice always use Python environment. In this case I use Windows 10.
 - Activate venv by run `venv/scripts/activate` or if you use Linux based `source venv/bin/activate`
 - After venv active, install dependencies with `pip install -r requirements.txt`
 - Change directory to `cd logiblue` (where `manage.py` file located)
+- Dump Country and Category by run command: `python manage.py dump_country` and `python manage.py dump_category`
 - Run migration first by `python manage.py migrate`
 - Run application server by `python manage.py runserver`
 - Open web-browser and typing `http://localhost:8000`
