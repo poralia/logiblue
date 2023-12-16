@@ -111,19 +111,23 @@ class RajaOngkir:
 
         r = self.session.post(url, data=payload)
         rajaongkir = r.json().get('rajaongkir', {})
-        results = rajaongkir.get('results', [])
-        origin_details = rajaongkir.get('origin_details', {})
-        destination_details = rajaongkir.get('destination_details', {})
+        data = {}
+        message = ''
 
-        # use ECO service from TIKI
-        # for demo purpose only
-        tiki = next(filter(self.get_tiki, results), None)
-        tiki_service = next(filter(self.get_tiki_service, tiki.get('costs', [])), None)
-        tiki_service_cost = tiki_service.get('cost')[0].get('value')
+        if r.status_code == 200:
+            results = rajaongkir.get('results', [])
+            origin_details = rajaongkir.get('origin_details', {})
+            destination_details = rajaongkir.get('destination_details', {})
 
-        ret = {
-            'status_code': r.status_code,
-            'data': {
+            # use ECO service from TIKI
+            # for demo purpose only
+            tiki = next(filter(self.get_tiki, results), None)
+            print(tiki)
+            tiki_service = next(filter(self.get_tiki_service, tiki.get('costs', [])), None)
+            tiki_service_cost = tiki_service.get('cost')[0].get('value')
+            message = 'Success!'
+
+            data.update({
                 'origin': category.country.name,
                 'origin_details': origin_details,
                 'destination_details': destination_details,
@@ -133,7 +137,14 @@ class RajaOngkir:
                 'domestic_price': tiki_service_cost,
                 'total_price': tiki_service_cost + category.cost,
                 # 'domestic_shippings': results,
-            },
+            })
+        else:
+            message = rajaongkir.get('status', {}).get('description', '')
+
+        ret = {
+            'status_code': r.status_code,
+            'data': data,
+            'message': message,
         }
 
         return ret
