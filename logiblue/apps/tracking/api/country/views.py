@@ -10,7 +10,7 @@ class CountryListAPIView(generics.ListAPIView):
     permission_classes = (AllowAny, )
 
     def get_queryset(self):
-        queryset = Country.objects.all()
+        queryset = Country.objects.all().order_by('name')
         request = self.request
         search = request.query_params.get('search', None)
         if search is not None:

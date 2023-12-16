@@ -84,8 +84,9 @@ class RajaOngkir:
             return x
         return None
 
-    def get_tiki_eco(self, x):
-        if x.get('service') == 'ECO':
+    def get_tiki_service(self, x):
+        services = ['ECO', 'REG']
+        if x.get('service') in services:
             return x
         return None
 
@@ -117,8 +118,8 @@ class RajaOngkir:
         # use ECO service from TIKI
         # for demo purpose only
         tiki = next(filter(self.get_tiki, results), None)
-        tiki_eco = next(filter(self.get_tiki_eco, tiki.get('costs', [])), None)
-        tiki_eco_cost = tiki_eco.get('cost')[0].get('value')
+        tiki_service = next(filter(self.get_tiki_service, tiki.get('costs', [])), None)
+        tiki_service_cost = tiki_service.get('cost')[0].get('value')
 
         ret = {
             'status_code': r.status_code,
@@ -129,8 +130,8 @@ class RajaOngkir:
                 'destination': destination_id,
                 'category_name': category.title,
                 'international_shipping_price': category.cost,
-                'domestic_price': tiki_eco_cost,
-                'total_price': tiki_eco_cost + category.cost,
+                'domestic_price': tiki_service_cost,
+                'total_price': tiki_service_cost + category.cost,
                 # 'domestic_shippings': results,
             },
         }
